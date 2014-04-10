@@ -243,7 +243,7 @@ class BoostOptional:
     "Pretty Printer for boost::optional (Boost.Optional)"
     printer_name = 'boost::optional'
     version = '1.40'
-    type_name_re = '^boost::optional<(.*)>$'
+    type_name_re = '^boost::optional<(.*?)((const)? *[*&]? *(const)?)>$'
     regex = re.compile(type_name_re)
 
     def __init__(self, value):
@@ -273,6 +273,8 @@ class BoostOptional:
             if match:
                 try:
                     membertype = gdb.lookup_type(match.group(1)).pointer()
+                    if match.group(2):
+                        membertype = membertype.pointer()
                     member = self.value['m_storage']['dummy_']['data'].address.cast(membertype)
                     return self._iterator(member, False)
                 except:
